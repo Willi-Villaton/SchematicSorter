@@ -18,14 +18,11 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 //TODO: Step into folder villaton/, then step back with <--back gives one folder to big
-//TODO: Sorting is messed up.
-//TODO: Pageing
-
+//TODO: Sorting is messed up. -> Change standart sort from unsorted to alphabetically.
 
 public class Schems implements TabExecutor {
 
     private final static String WE_PATH = "plugins/WorldEdit/schematics";
-
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -151,6 +148,7 @@ public class Schems implements TabExecutor {
         LinkedList<TextComponent[]> output;
         int sort = 0;
         int page;
+        String path = "";
 
         switch (args.length) {
             case 1: //schems list
@@ -172,7 +170,9 @@ public class Schems implements TabExecutor {
                 if (args[1].matches("(\\.?/?(([A-Za-z0-9 -_]+/)+[a-zA-Z0-9 -_]+/?))|(/?([A-Za-z0-9 -_]+/?))") //TODO REGEX
                         && !args[1].equals("-n") && !args[1].equals("-o")
                         && !args[1].equals("-a") && !args[1].equals("-z")) {
-                    sorted_folder = sort_files_in_folder(sender, args[1], wo_path, 0);
+                    path = args[1];
+                    path = path.matches("[\\.]{2,}") ? "." : path;
+                    sorted_folder = sort_files_in_folder(sender, path, wo_path, 0);
                 } else {
 
                     switch (args[1]) {
@@ -213,7 +213,7 @@ public class Schems implements TabExecutor {
 
                         sorted_folder = sort_files_in_folder(sender, null, wo_path, 0);
 
-                        int total_pages = (sorted_folder[0].size() + sorted_folder[1].size() - 2) / 15;
+                        int total_pages = (sorted_folder[0].size() + sorted_folder[1].size() - 2) / UiHandler.getElementsPerPage();
                         if (page < 0 || page > total_pages) {
                             sender.sendMessage(UiHandler.invalid_page_error(total_pages, page));
                             return;
@@ -250,7 +250,9 @@ public class Schems implements TabExecutor {
                         return;
                 }
 
-                sorted_folder = sort_files_in_folder(sender, args[1], wo_path, sort);
+                path = args[1];
+                path = path.matches("[\\.]{2,}") ? "." : path;
+                sorted_folder = sort_files_in_folder(sender, path, wo_path, sort);
                 if (sorted_folder == null) {
                     return;
                 }
@@ -296,7 +298,7 @@ public class Schems implements TabExecutor {
                         return;
                     }
 
-                    int total_pages = (sorted_folder[0].size() + sorted_folder[1].size() - 2) / 15;
+                    int total_pages = (sorted_folder[0].size() + sorted_folder[1].size() - 2) / UiHandler.getElementsPerPage();
                     if (page < 0 || page > total_pages) {
                         sender.sendMessage(UiHandler.invalid_page_error(total_pages, page));
                         return;
@@ -316,12 +318,14 @@ public class Schems implements TabExecutor {
                         sender.sendMessage(UiHandler.wrong_parameters_error());
                     }
 
-                    sorted_folder = sort_files_in_folder(sender, args[1], wo_path, 0);
+                    path = args[1];
+                    path = path.matches("[\\.]{2,}") ? "." : path;
+                    sorted_folder = sort_files_in_folder(sender, path, wo_path, 0);
                     if (sorted_folder == null) {
                         return;
                     }
 
-                    int total_pages = (sorted_folder[0].size() + sorted_folder[1].size() - 2) / 15;
+                    int total_pages = (sorted_folder[0].size() + sorted_folder[1].size() - 2) / UiHandler.getElementsPerPage();
                     if (page < 0 || page > total_pages) {
                         sender.sendMessage(UiHandler.invalid_page_error(total_pages, page));
                         return;
@@ -366,12 +370,14 @@ public class Schems implements TabExecutor {
                         return;
                 }
 
-                sorted_folder = sort_files_in_folder(sender, args[1], wo_path, sort);
+                path = args[1];
+                path = path.matches("[\\.]{2,}") ? "." : path;
+                sorted_folder = sort_files_in_folder(sender, path, wo_path, sort);
                 if (sorted_folder == null) {
                     return;
                 }
 
-                int total_pages = (sorted_folder[0].size() + sorted_folder[1].size() - 2) / 15;
+                int total_pages = (sorted_folder[0].size() + sorted_folder[1].size() - 2) / UiHandler.getElementsPerPage();
                 if (page < 0 || page > total_pages) {
                     sender.sendMessage(UiHandler.invalid_page_error(total_pages, page));
                     return;
@@ -1024,7 +1030,7 @@ public class Schems implements TabExecutor {
             flags = args[1];
         }
         player.performCommand("/copy " + flags);
-        player.performCommand("/schematic save " + player.getName() + "_tmp.schem" + " -f");
+        player.performCommand("/schematic save /temporary/" + player.getName() + "_tmp.schem" + " -f");
     }
 
     // ------------------------------ Paste ----------------------------------------------------------------------------
@@ -1045,9 +1051,9 @@ public class Schems implements TabExecutor {
             }
             flags = args[1];
         }
-        player.performCommand("/schematic load " + player.getName() + "_tmp.schem");
+        player.performCommand("/schematic load /temporary/" + player.getName() + "_tmp.schem");
         player.performCommand("/paste " + flags);
-        player.performCommand("schems remove " + player.getName() + "_tmp.schem");
+        player.performCommand("schems remove /temporary/" + player.getName() + "_tmp.schem");
     }
 
     // ------------------------------ Tab Complete ---------------------------------------------------------------------

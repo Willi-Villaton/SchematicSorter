@@ -5,6 +5,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,9 +13,9 @@ import com.villaton.schematicsorter.commands.Schems;
 
 import java.util.LinkedList;
 
-import static java.lang.Math.ceil;
-
 public class UiHandler {
+
+    private final static int ELEMENTS_PER_PAGE = 10;
 
     /*
      * This class lists all User Interfaces from this plugin
@@ -337,7 +338,7 @@ public class UiHandler {
         // elements: 0 = folders, 1 = schematics, 2 = folder_dates, 3 = schematic_dates, 4 = folder_sizes, 5 = schematic_sizes, 6 = path
 
         int total_elements = elements[1].size() + elements[0].size();
-        int total_pages = (int) Math.floor(total_elements / 10.0);
+        int total_pages = (int) Math.floor(total_elements / ELEMENTS_PER_PAGE);
         //Wrong page index
         if (page > total_pages) {
             LinkedList<TextComponent[]> error = new LinkedList<>();
@@ -347,17 +348,17 @@ public class UiHandler {
             return error;
         }
 
-        String[][] page_content = new String[10][4];
-        if (page * 10 <= elements[1].size()) {
+        String[][] page_content = new String[ELEMENTS_PER_PAGE][4];
+        if (page * ELEMENTS_PER_PAGE <= elements[1].size()) {
             int pos_on_page = 0;
-            for (int pos_in_list = page * 10; pos_in_list < elements[1].size() && pos_on_page < 10; pos_in_list++, pos_on_page++) {
+            for (int pos_in_list = page * ELEMENTS_PER_PAGE; pos_in_list < elements[1].size() && pos_on_page < ELEMENTS_PER_PAGE; pos_in_list++, pos_on_page++) {
                 page_content[pos_on_page][0] = elements[1].get(pos_in_list);
                 page_content[pos_on_page][1] = "F";
                 page_content[pos_on_page][2] = elements[3].get(pos_in_list);
                 page_content[pos_on_page][3] = elements[5].get(pos_in_list);
             }
-            if (pos_on_page < 10) {
-                for (int pos_in_list = 0; pos_in_list < elements[0].size() && pos_on_page < 10; pos_in_list++, pos_on_page++) {
+            if (pos_on_page < ELEMENTS_PER_PAGE) {
+                for (int pos_in_list = 0; pos_in_list < elements[0].size() && pos_on_page < ELEMENTS_PER_PAGE; pos_in_list++, pos_on_page++) {
                     page_content[pos_on_page][0] = elements[0].get(pos_in_list);
                     page_content[pos_on_page][1] = "S";
                     page_content[pos_on_page][2] = elements[2].get(pos_in_list);
@@ -365,7 +366,7 @@ public class UiHandler {
                 }
             }
         } else {
-            for (int pos_in_list =  page * 10 - elements[1].size(), pos_on_page = 0; pos_in_list < elements[0].size() && pos_on_page < 10; pos_in_list++, pos_on_page++) {
+            for (int pos_in_list =  page * ELEMENTS_PER_PAGE - elements[1].size(), pos_on_page = 0; pos_in_list < elements[0].size() && pos_on_page < ELEMENTS_PER_PAGE; pos_in_list++, pos_on_page++) {
                 page_content[pos_on_page][0] = elements[0].get(pos_in_list);
                 page_content[pos_on_page][1] = "S";
                 page_content[pos_on_page][2] = elements[2].get(pos_in_list);
@@ -431,7 +432,6 @@ public class UiHandler {
                     case 4:
                         sorting = " -z ";
                         break;
-
                 }
                 if (page > 0) {
                     last_page[0].setText("" + ChatColor.YELLOW + ChatColor.STRIKETHROUGH
@@ -448,14 +448,15 @@ public class UiHandler {
             }
             //End of close for partially filled page
 
+            TextComponent hover;
+            //Page content
             if (page_content[i][1].equals("F")) {
                 current_element = new TextComponent[] {
                         new TextComponent(ChatColor.GRAY + "? "),
                         new TextComponent(ChatColor.YELLOW + "[" + ChatColor.RED + "X" + ChatColor.YELLOW + "] "),
                         new TextComponent(ChatColor.LIGHT_PURPLE + "-F- "),
                         new TextComponent(ChatColor.WHITE + ": "),
-                        new TextComponent(ChatColor.WHITE + page_content[i][0]),
-                        new TextComponent(ChatColor.GRAY + " (" + page_content[i][2] + " | " + page_content[i][3] + ") ")
+                        new TextComponent(ChatColor.DARK_GREEN + page_content[i][0])
                 };
 
                 //Hover and Click for remove
@@ -467,8 +468,11 @@ public class UiHandler {
                 current_element[2].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new ComponentBuilder("-F- for folder, -S- for schematic.").color(ChatColor.GOLD).create()));
                 //Hover and Click for loading
+                hover = new TextComponent(new ComponentBuilder("Click to display the content of this folder.").color(ChatColor.GOLD)
+                        .append(ComponentSerializer.parse("{text: \"\n\"}"))
+                        .append("Size of this folder: " + page_content[i][2] + ", Last Modified: " + page_content[i][3]).color(ChatColor.GOLD).create());
                 current_element[4].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                        new ComponentBuilder("Click to display the content of this folder.").color(ChatColor.GOLD).create()));
+                        new ComponentBuilder(hover).color(ChatColor.GOLD).create()));
                 current_element[4].setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                         "/schems list ." + Schems.get_path(page_content[i][0], elements[6].get(0),false)));
 
@@ -479,8 +483,7 @@ public class UiHandler {
                         new TextComponent(ChatColor.YELLOW + "[" + ChatColor.RED + "X" + ChatColor.YELLOW + "] "),
                         new TextComponent(ChatColor.GOLD + "-S- "),
                         new TextComponent(ChatColor.WHITE + ": "),
-                        new TextComponent(ChatColor.WHITE + page_content[i][0]),
-                        new TextComponent(ChatColor.GRAY + " (" + page_content[i][2] + " | " + page_content[i][3] + ") ")
+                        new TextComponent(ChatColor.DARK_GREEN + page_content[i][0])
                 };
                 //Hover and Click for remove
                 current_element[2].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
@@ -491,8 +494,11 @@ public class UiHandler {
                 current_element[3].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new ComponentBuilder("-F- for folder, -S- for schematic.").color(ChatColor.GOLD).create()));
                 //Hover and Click for loading
+                hover = new TextComponent(new ComponentBuilder("Click to load this schematic.").color(ChatColor.GOLD)
+                        .append(ComponentSerializer.parse("{text: \"\n\"}"))
+                        .append("Size of this file: " + page_content[i][2] + ", Last Modified: " + page_content[i][3]).color(ChatColor.GOLD).create());
                 current_element[5].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                        new ComponentBuilder("Click to load this schematic.").color(ChatColor.GOLD).create()));
+                        new ComponentBuilder(hover).color(ChatColor.GOLD).create()));
                 current_element[5].setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                         "/schems load ." + Schems.get_path(page_content[i][0], null,false)));
             }
@@ -788,5 +794,10 @@ public class UiHandler {
                 ChatColor.RED + "Insufficient authorisation level.",
                 ChatColor.RED + "You are not entitled to perform this command!"
         };
+    }
+
+    // ----------------------------------- Getter --------------------------------------
+    public static int getElementsPerPage() {
+        return ELEMENTS_PER_PAGE;
     }
 }
