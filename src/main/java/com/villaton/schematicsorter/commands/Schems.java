@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-//TODO: Step into folder villaton/, then step back with <--back gives one folder to big
 //TODO: Sorting is messed up. -> Change standart sort from unsorted to alphabetically.
 
 public class Schems implements TabExecutor {
@@ -431,6 +430,11 @@ public class Schems implements TabExecutor {
         } else {
             final_path.add(tmp_path);
         }
+
+        //On wish, standard sort is alphabetically ascending
+        if (sort == 0) {
+            sort = 3;
+        }
         switch (sort) {
             case 0:
                 all_contents.add(all_names);
@@ -443,7 +447,6 @@ public class Schems implements TabExecutor {
                 }
                 all_contents.add(dates);
                 all_contents.add(sizes);
-
                 break;
             case 1:
                 all_contents = sort_for_newest(files);
@@ -536,7 +539,7 @@ public class Schems implements TabExecutor {
             case 2:
                 path = tmp_path[0];
                 break;
-            case 3:
+            default:
                 for (int i = 0; i < tmp_path.length - 2; i++) {
                     path += tmp_path[i] + "/";
                 }
@@ -579,6 +582,7 @@ public class Schems implements TabExecutor {
 
     private static LinkedList<String[]> sort_for_newest(File[] files) {
         Arrays.sort(files, Comparator.comparingLong(File::lastModified));
+
         String[] raw_list = new String[files.length];
         String[] dates = new String[files.length];
         String[] sizes = new String[files.length];
@@ -599,6 +603,7 @@ public class Schems implements TabExecutor {
 
     private static LinkedList<String[]> sort_for_oldest(File[] files) {
         Arrays.sort(files, Comparator.comparingLong(File::lastModified));
+
         String[] raw_list = new String[files.length];
         String[] dates = new String[files.length];
         String[] sizes = new String[files.length];

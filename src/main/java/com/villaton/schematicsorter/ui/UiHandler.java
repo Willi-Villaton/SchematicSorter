@@ -387,13 +387,15 @@ public class UiHandler {
                 new TextComponent("")
         };
 
+        String path = "";
         //Enable step back
         if (!elements[6].get(0).equals("")) {
             header[0].setText(ChatColor.YELLOW + "<-- " + ChatColor.GOLD + "Back");
             header[0].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                     new ComponentBuilder("Step one folder back").color(ChatColor.GOLD).create()));
-            String path = Schems.one_folder_back(sender, elements[6].get(0));
+            path = Schems.one_folder_back(sender, elements[6].get(0));
             path = path.startsWith(" ") ? path.substring(1) : path;
+            path = path.startsWith(".") ? path.substring(1) : path;
             header[0].setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                     "/schems list ." + path));
             output.add(header);
@@ -438,8 +440,10 @@ public class UiHandler {
                             + "---------------");
                     last_page[1].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                             new ComponentBuilder("Show previous page").color(ChatColor.GOLD).create()));
+                    path = Schems.get_path(elements[6].get(0), null,false);
+                    path = path.startsWith(".") ? path.substring(1) : path;
                     last_page[1].setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                            "/schems list ." + Schems.get_path(elements[6].get(0), null,false) + " -p " + page + sorting));
+                            "/schems list ." + path + " -p " + page + sorting));
                 } else {
                     last_page[1].setText("");
                 }
@@ -462,8 +466,10 @@ public class UiHandler {
                 //Hover and Click for remove
                 current_element[1].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new ComponentBuilder("Click to delete this folder.").color(ChatColor.GOLD).create()));
+                path = Schems.get_path(page_content[i][0], elements[6].get(0),false);
+                path = path.startsWith(".") ? path.substring(1) : path;
                 current_element[1].setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
-                        "/schems remove ." + Schems.get_path(page_content[i][0], elements[6].get(0),false)));
+                        "/schems remove ." + path));
                 //Hover for -F-
                 current_element[2].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new ComponentBuilder("-F- for folder, -S- for schematic.").color(ChatColor.GOLD).create()));
@@ -473,8 +479,10 @@ public class UiHandler {
                         .append("Size of this folder: " + page_content[i][2] + ", Last Modified: " + page_content[i][3]).color(ChatColor.GOLD).create());
                 current_element[4].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new ComponentBuilder(hover).color(ChatColor.GOLD).create()));
+                path = Schems.get_path(page_content[i][0], elements[6].get(0),false);
+                path = path.startsWith(".") ? path.substring(1) : path;
                 current_element[4].setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                        "/schems list ." + Schems.get_path(page_content[i][0], elements[6].get(0),false)));
+                        "/schems list ." + path));
 
             } else {
                 current_element = new TextComponent[] {
@@ -488,8 +496,10 @@ public class UiHandler {
                 //Hover and Click for remove
                 current_element[2].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new ComponentBuilder("Click to delete this schematic.").color(ChatColor.GOLD).create()));
+                path = Schems.get_path(page_content[i][0], elements[6].get(0),false);
+                path = path.startsWith(".") ? path.substring(1) : path;
                 current_element[2].setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                        "/schems remove ." + Schems.get_path(page_content[i][0], elements[6].get(0),false) + ".schem"));
+                        "/schems remove ." + path + ".schem"));
                 //Hover for -S-
                 current_element[3].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new ComponentBuilder("-F- for folder, -S- for schematic.").color(ChatColor.GOLD).create()));
@@ -499,8 +509,9 @@ public class UiHandler {
                         .append("Size of this file: " + page_content[i][2] + ", Last Modified: " + page_content[i][3]).color(ChatColor.GOLD).create());
                 current_element[5].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new ComponentBuilder(hover).color(ChatColor.GOLD).create()));
-                current_element[5].setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                        "/schems load ." + Schems.get_path(page_content[i][0], null,false)));
+                path = Schems.get_path(page_content[i][0], null,false);
+                path = path.startsWith(".") ? path.substring(1) : path;
+                current_element[5].setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/schems load ." + path));
             }
             output.add(current_element);
 
@@ -539,8 +550,10 @@ public class UiHandler {
                             + "---------------");
                     output.get(output.size() - 1)[1].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                             new ComponentBuilder("Show previous page").color(ChatColor.GOLD).create()));
+                    path = Schems.get_path(elements[6].get(0), null, false);
+                    path = path.startsWith(".") ? path.substring(1) : path;
                     output.get(output.size() - 1)[1].setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                            "/schems list ." + Schems.get_path(elements[6].get(0), null, false) + " -p " + page + sorting));
+                            "/schems list ." + path + " -p " + page + sorting));
                 } else {
                     output.get(output.size() - 1)[1].setText("");
                 }
@@ -548,8 +561,10 @@ public class UiHandler {
                 if (page - 1 < total_pages) {
                     output.get(output.size() - 1)[3].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                             new ComponentBuilder("Show next page").color(ChatColor.GOLD).create()));
+                    path = Schems.get_path(elements[6].get(0), null,false);
+                    path = path.startsWith(".") ? path.substring(1) : path;
                     output.get(output.size() - 1)[3].setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-                            "/schems list ." + Schems.get_path(elements[6].get(0), null,false) + " -p " + page + sorting));
+                            "/schems list ." + path + " -p " + page + sorting));
                     output.get(output.size() - 1)[4].setText("" + ChatColor.YELLOW + ChatColor.STRIKETHROUGH
                             + "---------------");
                 } else {
