@@ -693,7 +693,7 @@ public class Schems implements TabExecutor {
                     if (matcher1.group(1) == null || matcher2.group(1) == null) {
                         return matcher1.group().compareTo(matcher2.group());
                     } else {
-                        return Integer.valueOf(matcher1.group(1)).compareTo(Integer.valueOf(matcher2.group(1)));
+                        return Long.valueOf(matcher1.group(1)).compareTo(Long.valueOf(matcher2.group(1)));
                     }
                 }
             }
