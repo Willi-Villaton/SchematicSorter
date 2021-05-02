@@ -19,8 +19,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//TODO: Sorting is messed up. -> Change standart sort from unsorted to alphabetically.
-
 public class Schems implements TabExecutor {
 
     private final static String WE_PATH = "plugins/WorldEdit/schematics";
