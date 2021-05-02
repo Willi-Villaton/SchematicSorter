@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //TODO: Sorting is messed up. -> Change standart sort from unsorted to alphabetically.
 
@@ -465,6 +467,7 @@ public class Schems implements TabExecutor {
                 return null;
 
         }
+
         for (int i = 0; i < all_contents.get(0).length; i++) {
             String current_element = all_contents.get(0)[i];
             if (current_element.matches("([A-Za-z0-9 -_]+\\.schematic)|([A-Za-z0-9 -_]+\\.schem)")) {
@@ -624,20 +627,8 @@ public class Schems implements TabExecutor {
 
     private static LinkedList<String[]> sort_ascending(String[] raw_list, File[] files) {
 
-        LinkedList<String> raw = new LinkedList<>();
-        Collections.addAll(raw, raw_list);
-
-        Collections.sort(raw, new Comparator<String>() {
-            public int compare(String o1, String o2) {
-                return extractInt(o1) -  extractInt(o2);
-            }
-
-            int extractInt(String s) {
-                String num = s.replaceAll("\\D", "");
-                // return 0 if no digits found
-                return num.isEmpty() ? 0 : Integer.parseInt(num);
-            }
-        });
+        LinkedList<String> raw = new LinkedList<>(Arrays.asList(raw_list));
+        raw.sort(naturalOrdering());
 
         String[] dates = new String[raw.size()];
         String[] sizes = new String[files.length];
@@ -664,18 +655,7 @@ public class Schems implements TabExecutor {
     private static LinkedList<String[]> sort_descending(String[] raw_list, File[] files) {
 
         LinkedList<String> raw = new LinkedList<>(Arrays.asList(raw_list));
-
-        Collections.sort(raw, new Comparator<String>() { //TODO Komischer Fehler
-            public int compare(String o1, String o2) {
-                return extractInt(o2) - extractInt(o1);
-            }
-
-            int extractInt(String s) {
-                String num = s.replaceAll("\\D", "");
-                // return 0 if no digits found
-                return num.isEmpty() ? 0 : Integer.parseInt(num);
-            }
-        });
+        raw.sort(naturalOrdering().reversed());
 
         String[] dates = new String[raw.size()];
         String[] sizes = new String[files.length];
@@ -699,6 +679,26 @@ public class Schems implements TabExecutor {
         return ret;
     }
 
+    public static Comparator<String> naturalOrdering() {
+        final Pattern compile = Pattern.compile("(\\d+)|(\\D+)");
+        return (s1, s2) -> {
+            final Matcher matcher1 = compile.matcher(s1);
+            final Matcher matcher2 = compile.matcher(s2);
+            while (true) {
+                final boolean found1 = matcher1.find();
+                final boolean found2 = matcher2.find();
+                if (!found1 || !found2) {
+                    return Boolean.compare(found1, found2);
+                } else if (!matcher1.group().equals(matcher2.group())) {
+                    if (matcher1.group(1) == null || matcher2.group(1) == null) {
+                        return matcher1.group().compareTo(matcher2.group());
+                    } else {
+                        return Integer.valueOf(matcher1.group(1)).compareTo(Integer.valueOf(matcher2.group(1)));
+                    }
+                }
+            }
+        };
+    }
 
     // ------------------------------ cd -------------------------------------------------------------------------------
     private static void command_cd(@Nullable CommandSender sender, String[] args, Player player, String wo_path) {
