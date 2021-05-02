@@ -114,7 +114,7 @@ public class UiHandler {
                         + " (optional): Sorts the files alphabetically ascending.",
                 " * " + ChatColor.YELLOW + "[" + ChatColor.GOLD + "-z" + ChatColor.YELLOW + "]" + ChatColor.GRAY
                         + " (optional): Sorts the files alphabetically descending.",
-                ChatColor.GOLD + ">>> " + ChatColor.GRAY + "By default, the files are displayed as in the folder.",
+                ChatColor.GOLD + ">>> " + ChatColor.GRAY + "By default, the files are displayed alphabetically.",
                 //Close
                 "" + ChatColor.YELLOW + ChatColor.STRIKETHROUGH + "----------------------------------------------"
         };
