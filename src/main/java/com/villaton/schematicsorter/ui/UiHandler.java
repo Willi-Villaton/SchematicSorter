@@ -476,7 +476,7 @@ public class UiHandler {
                 //Hover and Click for loading
                 hover = new TextComponent(new ComponentBuilder("Click to display the content of this folder.").color(ChatColor.GOLD)
                         .append(ComponentSerializer.parse("{text: \"\n\"}"))
-                        .append("Size of this folder: " + page_content[i][2] + ", Last Modified: " + page_content[i][3]).color(ChatColor.GOLD).create());
+                        .append("Size of this folder: " + page_content[i][3] + ", Last Modified: " + page_content[i][2]).color(ChatColor.GOLD).create());
                 current_element[4].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new ComponentBuilder(hover).color(ChatColor.GOLD).create()));
                 path = Schems.get_path(page_content[i][0], elements[6].get(0),false);
@@ -506,7 +506,7 @@ public class UiHandler {
                 //Hover and Click for loading
                 hover = new TextComponent(new ComponentBuilder("Click to load this schematic.").color(ChatColor.GOLD)
                         .append(ComponentSerializer.parse("{text: \"\n\"}"))
-                        .append("Size of this file: " + page_content[i][2] + ", Last Modified: " + page_content[i][3]).color(ChatColor.GOLD).create());
+                        .append("Size of this file: " + page_content[i][3] + ", Last Modified: " + page_content[i][2]).color(ChatColor.GOLD).create());
                 current_element[5].setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                         new ComponentBuilder(hover).color(ChatColor.GOLD).create()));
                 path = Schems.get_path(page_content[i][0], null,false);
