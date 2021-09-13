@@ -35,12 +35,13 @@ public class Schems implements TabExecutor {
         Player player = (Player) sender;
 
         if (!player.hasPermission("SchematicSorter")) {
-            sender.sendMessage(UiHandler.insufficient_permission());
+            player.sendMessage(UiHandler.insufficient_permission());
             return false;
         }
 
         //Check for working dir
         String wo_path = UserStorage.getCwd(player.getUniqueId());
+        wo_path = wo_path == null ? "" : wo_path;
 
         //No parameters given.
         if (args.length <= 0) {
@@ -90,7 +91,7 @@ public class Schems implements TabExecutor {
     }
 
     // ------------------------------ help -----------------------------------------------------------------------------
-    private static void command_help(@Nullable CommandSender sender, String[] args) {
+    private static void command_help(CommandSender sender, String[] args) {
         if (args.length <= 1) {
             //General help menu
             sender.sendMessage(UiHandler.help_menu());
@@ -142,13 +143,13 @@ public class Schems implements TabExecutor {
 
 
     // ------------------------------ list -----------------------------------------------------------------------------
-    private static void command_list(@Nullable CommandSender sender, String[] args, Player player, String wo_path) {
+    private static void command_list(CommandSender sender, String[] args, Player player, String wo_path) {
 
         LinkedList<String>[] sorted_folder;
         LinkedList<TextComponent[]> output;
         int sort = 0;
         int page;
-        String path = "";
+        String path;
 
         switch (args.length) {
             case 1: //schems list
@@ -405,7 +406,7 @@ public class Schems implements TabExecutor {
         File folder = validate_file(sender, path, wo_path, false);
         //Validate path
         if (folder == null || !folder.isDirectory()) {
-            sender.sendMessage(UiHandler.invalid_path_error());
+            sender.sendMessage(UiHandler.invalid_path_error(wo_path, path));
             return null;
         }
 
@@ -528,7 +529,7 @@ public class Schems implements TabExecutor {
         return path;
     }
 
-    public static String one_folder_back(@Nullable CommandSender sender, String path) {
+    public static String one_folder_back(CommandSender sender, String path) {
         //Hop back one folder
         String[] tmp_path = path.split("/");
         path = "";
@@ -542,9 +543,11 @@ public class Schems implements TabExecutor {
                 path = tmp_path[0];
                 break;
             default:
+                StringBuilder pathBuilder = new StringBuilder(path);
                 for (int i = 0; i < tmp_path.length - 2; i++) {
-                    path += tmp_path[i] + "/";
+                    pathBuilder.append(tmp_path[i]).append("/");
                 }
+                path = pathBuilder.toString();
                 path += tmp_path[tmp_path.length - 2];
         }
 
@@ -555,7 +558,7 @@ public class Schems implements TabExecutor {
         return path;
     }
 
-    private static File validate_file(@Nullable CommandSender sender, String path, String wo_path, boolean suppress_error) {
+    private static File validate_file(CommandSender sender, String path, String wo_path, boolean suppress_error) {
         try {
             path = get_path(path, wo_path, true);
             if (path == null) {
@@ -568,7 +571,7 @@ public class Schems implements TabExecutor {
 
             if (!file.exists()) {
                 if (!suppress_error) {
-                    sender.sendMessage(UiHandler.invalid_path_error());
+                    sender.sendMessage(UiHandler.invalid_path_error(wo_path, path));
                 }
                 return null;
             }
@@ -576,7 +579,7 @@ public class Schems implements TabExecutor {
         } catch (Exception e) {
             if (!suppress_error) {
                 sender.sendMessage(ChatColor.DARK_PURPLE + "Huhuu. Sag mal Villaton bitte was du angestellt hast.");
-                sender.sendMessage(UiHandler.invalid_path_error());
+                sender.sendMessage(UiHandler.invalid_path_error(wo_path, path));
             }
             return null;
         }
@@ -700,14 +703,14 @@ public class Schems implements TabExecutor {
     }
 
     // ------------------------------ cd -------------------------------------------------------------------------------
-    private static void command_cd(@Nullable CommandSender sender, String[] args, Player player, String wo_path) {
+    private static void command_cd(CommandSender sender, String[] args, Player player, String wo_path) {
 
         if (args.length > 2) {
             sender.sendMessage(UiHandler.too_many_parameters_error());
             return;
         }
         if (args.length == 1) {
-            if (wo_path == null || wo_path == "") {
+            if (wo_path == null || wo_path.equals("")) {
                 sender.sendMessage(UiHandler.cd_display("Not set - Standard path"));
             } else {
                 sender.sendMessage(UiHandler.cd_display(wo_path));
@@ -763,14 +766,13 @@ public class Schems implements TabExecutor {
                     //Validate path
                     File file = validate_file(sender, path, null, false);
                     if (file == null || !file.isDirectory()) {
-                        sender.sendMessage(UiHandler.invalid_path_error());
+                        sender.sendMessage(UiHandler.invalid_path_error(wo_path, path));
                         return;
                     }
 
                     //Update directory one
                     UserStorage.setCwd(player.getUniqueId(), path, true); //TODO IST DAS SCHLAU?
                     sender.sendMessage(UiHandler.cd(path));
-                    return;
                 } else {
                     //Operation relative to standard folder
                     if (wo_path == null) {
@@ -782,22 +784,20 @@ public class Schems implements TabExecutor {
                     //Validate path
                     File file = validate_file(sender, path, wo_path, false);
                     if (file == null || !file.isDirectory()) {
-                        sender.sendMessage(UiHandler.invalid_path_error());
-                        return;
+                        sender.sendMessage(UiHandler.invalid_path_error(wo_path, path));
                     }
 
                     //Update directory one
                     String new_path = wo_path + "/" + path;
                     UserStorage.setCwd(player.getUniqueId(), new_path, true); //TODO IST DAS SCHLAU?
                     sender.sendMessage(UiHandler.cd(new_path));
-                    return;
                 }
         }
     }
 
 
     // ------------------------------ Remove ---------------------------------------------------------------------------
-    private static void command_remove(@Nullable CommandSender sender, String[] args, String wo_path) {
+    private static void command_remove(CommandSender sender, String[] args, String wo_path) {
 
         //Checking for wrong parameters
         if (args.length > 3) {
@@ -858,7 +858,7 @@ public class Schems implements TabExecutor {
 
 
     // ------------------------------ Add ------------------------------------------------------------------------------
-    private static void command_add(@Nullable CommandSender sender, String[] args, String wo_path, boolean suppress_output) {
+    private static void command_add(CommandSender sender, String[] args, String wo_path, boolean suppress_output) {
         if (args.length > 2) {
             sender.sendMessage(UiHandler.too_many_parameters_error());
             return;
@@ -882,7 +882,7 @@ public class Schems implements TabExecutor {
 
 
     // ------------------------------ Move -----------------------------------------------------------------------------
-    private static void command_move(@Nullable CommandSender sender, String[] args, String wo_path, Player player) {
+    private static void command_move(CommandSender sender, String[] args, String wo_path, Player player) {
         if (args.length > 3) {
             sender.sendMessage(UiHandler.too_many_parameters_error());
         }
@@ -931,7 +931,7 @@ public class Schems implements TabExecutor {
 
 
     // ------------------------------ Load -----------------------------------------------------------------------------
-    private static void command_load(@Nullable CommandSender sender, String[] args, String wo_path, Player player) {
+    private static void command_load(CommandSender sender, String[] args, String wo_path, Player player) {
         if (args.length > 2) {
             sender.sendMessage(UiHandler.too_many_parameters_error());
         }
@@ -957,12 +957,12 @@ public class Schems implements TabExecutor {
             return;
         }
 
-        SchematicSorter.getInstance().performCommand(player, "/schematic load " + get_path(args[1], wo_path, false));
+        SchematicSorter.performCommand(player, "/schematic load " + get_path(args[1], wo_path, false));
     }
 
 
     // ------------------------------ Save -----------------------------------------------------------------------------
-    private static void command_save(@NotNull CommandSender sender, @NotNull String[] args, @NotNull String wo_path, @NotNull Player player) {
+    private static void command_save(CommandSender sender, @NotNull String[] args, @NotNull String wo_path, @NotNull Player player) {
         if (args.length > 3) {
             sender.sendMessage(UiHandler.too_many_parameters_error());
         }
@@ -976,7 +976,7 @@ public class Schems implements TabExecutor {
             if (file != null && file.exists()) {
                 sender.sendMessage(UiHandler.file_already_exists_error(args[1]));
             } else {
-                SchematicSorter.getInstance().performCommand(player, "/schematic save " + get_path(args[1], wo_path, false));
+                SchematicSorter.performCommand(player, "/schematic save " + get_path(args[1], wo_path, false));
             }
         } else {
             //If overwrite
@@ -984,12 +984,12 @@ public class Schems implements TabExecutor {
                 sender.sendMessage(UiHandler.wrong_parameters_error());
                 return;
             }
-            SchematicSorter.getInstance().performCommand(player, "/schematic save " + get_path(args[1], wo_path, false) + " -f");
+            SchematicSorter.performCommand(player, "/schematic save " + get_path(args[1], wo_path, false) + " -f");
         }
     }
 
     // ------------------------------ Size -----------------------------------------------------------------------------
-    private static void command_size(@Nullable CommandSender sender, String[] args, String wo_path) {
+    private static void command_size(CommandSender sender, String[] args, String wo_path) {
         if (args.length > 2) {
             sender.sendMessage(UiHandler.too_many_parameters_error());
         }
@@ -1033,8 +1033,9 @@ public class Schems implements TabExecutor {
             }
             flags = args[1];
         }
-        SchematicSorter.getInstance().performCommand(player, "/copy " + flags);
-        SchematicSorter.getInstance().performCommand(player, "/schematic save /temporary/" + player.getName() + "_tmp.schem" + " -f");
+
+        SchematicSorter.performCommand(player, "/copy " + flags);
+        SchematicSorter.performCommand(player, "/schematic save /temporary/" + player.getName() + "_tmp.schem" + " -f");
     }
 
     // ------------------------------ Paste ----------------------------------------------------------------------------
@@ -1055,9 +1056,9 @@ public class Schems implements TabExecutor {
             }
             flags = args[1];
         }
-        SchematicSorter.getInstance().performCommand(player, "/schematic load /temporary/" + player.getName() + "_tmp.schem");
-        SchematicSorter.getInstance().performCommand(player, "/paste " + flags);
-        SchematicSorter.getInstance().performCommand(player, "schems remove /temporary/" + player.getName() + "_tmp.schem");
+        SchematicSorter.performCommand(player, "/schematic load /temporary/" + player.getName() + "_tmp.schem");
+        SchematicSorter.performCommand(player, "/paste " + flags);
+        SchematicSorter.performCommand(player, "schems remove /temporary/" + player.getName() + "_tmp.schem");
     }
 
     // ------------------------------ Tab Complete ---------------------------------------------------------------------
@@ -1115,10 +1116,16 @@ public class Schems implements TabExecutor {
                 path = get_path(path, wo_path, false);
                 //If folder list content of this folder
                 File file = validate_file(sender, path, null, true);
+
                 if (file == null) {
                     return null;
                 }
+
                 File[] files = file.listFiles();
+
+                if (files == null) {
+                    return null;
+                }
 
                 for (File x : files) {
                     if (x.isFile()) {
@@ -1135,10 +1142,16 @@ public class Schems implements TabExecutor {
                 //If file list content of parent folder
                 path = one_folder_back(sender, path);
                 File file = validate_file(sender, path, null, true);
+
                 if (file == null) {
                     return null;
                 }
+
                 File[] files = file.listFiles();
+
+                if (files == null) {
+                    return null;
+                }
 
                 if (path == null) {
                     path = "";

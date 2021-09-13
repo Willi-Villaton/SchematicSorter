@@ -1,5 +1,6 @@
 package com.villaton.schematicsorter.ui;
 
+import com.villaton.schematicsorter.SchematicSorter;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -757,7 +758,9 @@ public class UiHandler {
         };
     }
 
-    public static @NotNull String[] invalid_path_error() {
+    public static @NotNull String[] invalid_path_error(String wo_path, String path) {
+        SchematicSorter.getInstance().debug("InvalidPathErrror: " + wo_path + "/" + path);
+
         return new String[] {
                 ChatColor.RED + "The given path seems to be incorrect.",
                 ChatColor.RED + "Only use sub-directories of " + ChatColor.YELLOW
