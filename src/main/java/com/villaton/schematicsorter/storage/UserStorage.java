@@ -1,5 +1,8 @@
 package com.villaton.schematicsorter.storage;
 
+import de.crafttogether.Callback;
+import de.crafttogether.mysql.MySQLAdapter;
+import de.crafttogether.mysql.MySQLConnection;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 import com.villaton.schematicsorter.SchematicSorter;
@@ -57,7 +60,7 @@ public class UserStorage {
 
     public static void insertOrUpdate(User user, @Nullable Callback<SQLException, Boolean> callback) {
         SchematicSorter plugin = SchematicSorter.getInstance();
-        MySQLAdapter.MySQLConnection MySQL = plugin.getMySQLAdapter().getConnection();
+        MySQLConnection MySQL = MySQLAdapter.getConnection();
 
         MySQL.queryAsync("SELECT * FROM `%suser` WHERE `uuid` = '" + user.getUuid() + "'", (err, result) -> {
             if (err != null) {
@@ -127,7 +130,7 @@ public class UserStorage {
 
     public static void remove(User user, @Nullable Callback<SQLException, Boolean> callback) {
         SchematicSorter plugin = SchematicSorter.getInstance();
-        MySQLAdapter.MySQLConnection MySQL = plugin.getMySQLAdapter().getConnection();
+        MySQLConnection MySQL = MySQLAdapter.getConnection();
 
         MySQL.updateAsync("DELETE FROM `%suser` WHERE `uuid` = '" + user.getUuid() + "';", (err, affectedRows) -> {
             if (err != null)
@@ -141,7 +144,7 @@ public class UserStorage {
 
     public static void loadAll(@Nullable Callback<SQLException, Collection<User>> callback) {
         SchematicSorter plugin = SchematicSorter.getInstance();
-        MySQLAdapter.MySQLConnection MySQL = plugin.getMySQLAdapter().getConnection();
+        MySQLConnection MySQL = MySQLAdapter.getConnection();
 
         MySQL.queryAsync("SELECT * FROM `%suser`", (err, result) -> {
             if (err != null) {
@@ -178,7 +181,7 @@ public class UserStorage {
 
     public static void load(UUID _uuid, @Nullable Callback<SQLException, User> callback) {
         SchematicSorter plugin = SchematicSorter.getInstance();
-        MySQLAdapter.MySQLConnection MySQL = plugin.getMySQLAdapter().getConnection();
+        MySQLConnection MySQL = MySQLAdapter.getConnection();
 
         MySQL.queryAsync("SELECT * FROM `%suser` WHERE `uuid` = '" + _uuid + "'", (err, result) -> {
             if (err != null) {

@@ -1,14 +1,12 @@
 package com.villaton.schematicsorter.storage.Listener;
 
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
+import com.villaton.schematicsorter.SchematicSorter;
+import com.villaton.schematicsorter.storage.UserStorage;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
-import com.villaton.schematicsorter.SchematicSorter;
-import com.villaton.schematicsorter.storage.UserStorage;
 
 public class Join_Listener implements Listener {
     private static Plugin plugin;
