@@ -3,6 +3,7 @@ version: ${project.version}
 main: com.villaton.schematicsorter.SchematicSorter
 api-version: 1.16
 authors: [ Villaton ]
+softdepend: [ WorldEdit, FastAsyncWorldEdit ]
 description: Enhanced schamatic control
 
 commands:
