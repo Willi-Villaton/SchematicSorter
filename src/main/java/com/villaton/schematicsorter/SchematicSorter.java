@@ -1,15 +1,17 @@
 package com.villaton.schematicsorter;
 
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
 import com.villaton.schematicsorter.commands.Schems;
 import com.villaton.schematicsorter.storage.Listener.Join_Listener;
 import com.villaton.schematicsorter.storage.MySQLAdapter;
 import com.villaton.schematicsorter.storage.UserStorage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public final class SchematicSorter extends JavaPlugin {
     private static SchematicSorter instance;
@@ -105,6 +107,32 @@ public final class SchematicSorter extends JavaPlugin {
 
     public MySQLAdapter getMySQLAdapter() {
         return mySQLAdapter;
+    }
+
+    /* Some static methods for simple debugging */
+
+    public static void debug(Player p, String message) {
+        debug(p, deserialize(message));
+    }
+
+    public static void debug(Player p, Component message) {
+        if (!getInstance().getConfig().getBoolean("Debug") || !p.hasPermission("schematicsorter.debug")) return;
+        p.sendMessage(deserialize("&4&l[Debug]: &e").append(message));
+    }
+
+    public static void debug(String message) {
+        if (getInstance().getConfig().getBoolean("Debug")) return;
+        getInstance().getLogger().info("[Debug]: " + message);
+    }
+
+    // Parse string with color codes '&' to component
+    public static Component deserialize(String message) {
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(message);
+    }
+
+    public static void performCommand(Player player, String cmd) {
+        debug(player, "Run CMD: " + cmd);
+        player.performCommand(cmd);
     }
 
     public static SchematicSorter getInstance() {

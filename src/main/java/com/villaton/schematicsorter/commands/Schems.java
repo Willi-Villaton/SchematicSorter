@@ -1,5 +1,6 @@
 package com.villaton.schematicsorter.commands;
 
+import com.villaton.schematicsorter.SchematicSorter;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.ChatColor;
@@ -956,7 +957,7 @@ public class Schems implements TabExecutor {
             return;
         }
 
-        player.performCommand("/schematic load " + get_path(args[1], wo_path, false));
+        SchematicSorter.getInstance().performCommand(player, "/schematic load " + get_path(args[1], wo_path, false));
     }
 
 
@@ -975,7 +976,7 @@ public class Schems implements TabExecutor {
             if (file != null && file.exists()) {
                 sender.sendMessage(UiHandler.file_already_exists_error(args[1]));
             } else {
-                player.performCommand("/schematic save " + get_path(args[1], wo_path, false));
+                SchematicSorter.getInstance().performCommand(player, "/schematic save " + get_path(args[1], wo_path, false));
             }
         } else {
             //If overwrite
@@ -983,7 +984,7 @@ public class Schems implements TabExecutor {
                 sender.sendMessage(UiHandler.wrong_parameters_error());
                 return;
             }
-            player.performCommand("/schematic save " + get_path(args[1], wo_path, false) + " -f");
+            SchematicSorter.getInstance().performCommand(player, "/schematic save " + get_path(args[1], wo_path, false) + " -f");
         }
     }
 
@@ -1032,8 +1033,8 @@ public class Schems implements TabExecutor {
             }
             flags = args[1];
         }
-        player.performCommand("/copy " + flags);
-        player.performCommand("/schematic save /temporary/" + player.getName() + "_tmp.schem" + " -f");
+        SchematicSorter.getInstance().performCommand(player, "/copy " + flags);
+        SchematicSorter.getInstance().performCommand(player, "/schematic save /temporary/" + player.getName() + "_tmp.schem" + " -f");
     }
 
     // ------------------------------ Paste ----------------------------------------------------------------------------
@@ -1054,9 +1055,9 @@ public class Schems implements TabExecutor {
             }
             flags = args[1];
         }
-        player.performCommand("/schematic load /temporary/" + player.getName() + "_tmp.schem");
-        player.performCommand("/paste " + flags);
-        player.performCommand("schems remove /temporary/" + player.getName() + "_tmp.schem");
+        SchematicSorter.getInstance().performCommand(player, "/schematic load /temporary/" + player.getName() + "_tmp.schem");
+        SchematicSorter.getInstance().performCommand(player, "/paste " + flags);
+        SchematicSorter.getInstance().performCommand(player, "schems remove /temporary/" + player.getName() + "_tmp.schem");
     }
 
     // ------------------------------ Tab Complete ---------------------------------------------------------------------
