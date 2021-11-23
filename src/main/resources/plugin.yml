@@ -1,0 +1,10 @@
+name: SchematicSorter
+version: '${project.version}'
+main: com.villaton.schematicsorter.SchematicSorter
+api-version: 1.17
+authors: [ Villaton, J0schlz ]
+description: An extended sorter for Worldedit schematics
+
+commands:
+  schems:
+    description: Schematic operations.
