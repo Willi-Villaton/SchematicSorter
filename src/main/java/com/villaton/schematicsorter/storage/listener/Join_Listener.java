@@ -1,4 +1,4 @@
-package com.villaton.schematicsorter.storage.Listener;
+package com.villaton.schematicsorter.storage.listener;
 
 import com.villaton.schematicsorter.SchematicSorter;
 import com.villaton.schematicsorter.storage.UserStorage;
@@ -11,8 +11,8 @@ import org.bukkit.plugin.Plugin;
 public class Join_Listener implements Listener {
     private static Plugin plugin;
 
-    public Join_Listener(SchematicSorter plugin) {
-        this.plugin = plugin;
+    public Join_Listener(SchematicSorter pluginInstance) {
+        plugin = pluginInstance;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 

@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class UserStorage {
-    private static SchematicSorter plugin = SchematicSorter.getInstance();
-    private static HashMap<UUID, User> users = new HashMap<>();
+    private static final SchematicSorter plugin = SchematicSorter.getInstance();
+    private static final HashMap<UUID, User> users = new HashMap<>();
 
     public static String getCwd(UUID uuid) {
         User user = users.get(uuid);
@@ -131,7 +131,7 @@ public class UserStorage {
                 plugin.getLogger().warning("[MySQL:] Error: " + err.getMessage());
 
             if (consumer != null)
-                consumer.operation(err, (err == null) ? true : false);
+                consumer.operation(err, err == null);
             connection.close();
         }, connection.getTablePrefix());
     }
@@ -155,8 +155,7 @@ public class UserStorage {
                         User user = new User(uuid, cwd);
 
                         // Update cache
-                        if (user != null)
-                            users.put(user.getUuid(), user);
+                        users.put(user.getUuid(), user);
                     }
                 } catch (SQLException ex) {
                     err = ex;

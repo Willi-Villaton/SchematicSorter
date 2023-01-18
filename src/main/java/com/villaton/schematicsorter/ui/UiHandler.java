@@ -759,7 +759,7 @@ public class UiHandler {
     }
 
     public static @NotNull String[] invalid_path_error(String wo_path, String path) {
-        SchematicSorter.getInstance().debug("InvalidPathErrror: " + wo_path + "/" + path);
+        SchematicSorter.debug("InvalidPathErrror: " + wo_path + "/" + path);
 
         return new String[] {
                 ChatColor.RED + "The given path seems to be incorrect.",

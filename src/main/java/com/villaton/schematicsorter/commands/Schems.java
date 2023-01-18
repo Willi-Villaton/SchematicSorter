@@ -44,7 +44,7 @@ public class Schems implements TabExecutor {
         wo_path = wo_path == null ? "" : wo_path;
 
         //No parameters given.
-        if (args.length <= 0) {
+        if (args.length == 0) {
             sender.sendMessage(UiHandler.too_few_parameters_error());
         } else {
             //Looking for different sub commands.
@@ -214,7 +214,10 @@ public class Schems implements TabExecutor {
 
                         sorted_folder = sort_files_in_folder(sender, null, wo_path, 0);
 
-                        int total_pages = (sorted_folder[0].size() + sorted_folder[1].size() - 2) / UiHandler.getElementsPerPage();
+                        int total_pages = 0;
+                        if (sorted_folder != null) {
+                            total_pages = (sorted_folder[0].size() + sorted_folder[1].size() - 2) / UiHandler.getElementsPerPage();
+                        }
                         if (page < 0 || page > total_pages) {
                             sender.sendMessage(UiHandler.invalid_page_error(total_pages, page));
                             return;

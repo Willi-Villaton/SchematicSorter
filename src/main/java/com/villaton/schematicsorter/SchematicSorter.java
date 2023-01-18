@@ -1,7 +1,7 @@
 package com.villaton.schematicsorter;
 
 import com.villaton.schematicsorter.commands.Schems;
-import com.villaton.schematicsorter.storage.Listener.Join_Listener;
+import com.villaton.schematicsorter.storage.listener.Join_Listener;
 import com.villaton.schematicsorter.storage.UserStorage;
 import de.crafttogether.common.dep.net.kyori.adventure.text.Component;
 import de.crafttogether.common.dep.net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -52,9 +52,7 @@ public final class SchematicSorter extends JavaPlugin {
         }
 
         // Create Tables
-        try {
-            ResultSet result = connection.query("SHOW TABLES LIKE '%suser';", connection.getTablePrefix());
-
+        try (ResultSet result = connection.query("SHOW TABLES LIKE '%suser';", connection.getTablePrefix())) {
             if (!result.next()) {
                 getLogger().info("[MySQL]: Create Tables ...");
 
