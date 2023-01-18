@@ -1,4 +1,6 @@
 # SchematicSorter
+**Depends on:** [CTCommons](https://modrinth.com/plugin/ctcommons)   
+   
 The plug-in has some extended features for managing schematics. In the following, I will simply list all the commands briefly with a sentence of explanation. 
 Basically, you can always get more detailed information about parameters etc. via /schems help [optional subcommand].
 
