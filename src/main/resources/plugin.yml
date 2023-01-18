@@ -1,12 +1,12 @@
 name: SchematicSorter
-version: ${project.version}
+version: '${project.version}'
+build: '${project.build.number}'
 main: com.villaton.schematicsorter.SchematicSorter
 api-version: 1.16
 authors: [ Villaton ]
-depend: [ MySQLAdapter ]
+depend: [ CTCommons ]
 softdepend: [ WorldEdit, FastAsyncWorldEdit ]
 description: Enhanced schamatic control
-
 commands:
   schems:
     description: Lists all schematics in a folder.

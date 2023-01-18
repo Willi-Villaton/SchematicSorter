@@ -711,9 +711,9 @@ public class Schems implements TabExecutor {
         }
         if (args.length == 1) {
             if (wo_path == null || wo_path.equals("")) {
-                sender.sendMessage(UiHandler.cd_display("Not set - Standard path"));
+                sender.spigot().sendMessage(UiHandler.cd_display("Not set - Standard path"));
             } else {
-                sender.sendMessage(UiHandler.cd_display(wo_path));
+                sender.spigot().sendMessage(UiHandler.cd_display(wo_path));
             }
             return;
         }
@@ -736,10 +736,10 @@ public class Schems implements TabExecutor {
                     //Saving new directory
                     if (wo_path.equals(WE_PATH)  || wo_path.equals("")) {
                         UserStorage.setCwd(player.getUniqueId(), null, true);
-                        sender.sendMessage(UiHandler.cd("Standard folder"));
+                        sender.spigot().sendMessage(UiHandler.cd("Standard folder"));
                     } else {
                         UserStorage.setCwd(player.getUniqueId(), wo_path, true);
-                        sender.sendMessage(UiHandler.cd(wo_path));
+                        sender.spigot().sendMessage(UiHandler.cd(wo_path));
                     }
                 } else {
                     sender.sendMessage(UiHandler.exit_standard_folder_error());
@@ -749,7 +749,7 @@ public class Schems implements TabExecutor {
             case "-s":
                 //Saving new directory
                 UserStorage.setCwd(player.getUniqueId(), null, true); //TODO IST DAS SCHLAU?
-                sender.sendMessage(UiHandler.cd("Standard folder"));
+                sender.spigot().sendMessage(UiHandler.cd("Standard folder"));
                 break;
             default:
                 //Operating relative to old working dir
@@ -772,7 +772,7 @@ public class Schems implements TabExecutor {
 
                     //Update directory one
                     UserStorage.setCwd(player.getUniqueId(), path, true); //TODO IST DAS SCHLAU?
-                    sender.sendMessage(UiHandler.cd(path));
+                    sender.spigot().sendMessage(UiHandler.cd(path));
                 } else {
                     //Operation relative to standard folder
                     if (wo_path == null) {
@@ -790,7 +790,7 @@ public class Schems implements TabExecutor {
                     //Update directory one
                     String new_path = wo_path + "/" + path;
                     UserStorage.setCwd(player.getUniqueId(), new_path, true); //TODO IST DAS SCHLAU?
-                    sender.sendMessage(UiHandler.cd(new_path));
+                    sender.spigot().sendMessage(UiHandler.cd(new_path));
                 }
         }
     }
@@ -827,20 +827,20 @@ public class Schems implements TabExecutor {
             file_path = file_path.endsWith(".schem") ? file_path + ".schem" : file_path;
             file = validate_file(sender, file_path, wo_path, true);
             if (file != null) {
-                sender.sendMessage(UiHandler.remove_other_name(file_path));
+                sender.spigot().sendMessage(UiHandler.remove_other_name(file_path));
             } else {
                 file_path = file_path.endsWith(".schem") ? file_path.substring(0, file_path.length() - 6) : file_path;
                 file_path = !file_path.endsWith(".schematic") ? file_path : file_path + ".schematic" ;
                 file = validate_file(sender, file_path, wo_path, false);
                 if (file != null) {
-                    sender.sendMessage(UiHandler.remove_other_name(file_path));
+                    sender.spigot().sendMessage(UiHandler.remove_other_name(file_path));
                 }
             }
             return;
         }
 
         if (!no_question) {
-            sender.sendMessage(UiHandler.remove(file.getName()));
+            sender.spigot().sendMessage(UiHandler.remove(file.getName()));
         } else {
             if (file.isDirectory()) {
                 try {
@@ -870,13 +870,13 @@ public class Schems implements TabExecutor {
 
         File file = validate_file(sender, args[1], wo_path, true);
         if (file != null && file.exists()) {
-            sender.sendMessage(UiHandler.folder_already_exists_error(get_path(args[1], wo_path, false)));
+            sender.spigot().sendMessage(UiHandler.folder_already_exists_error(get_path(args[1], wo_path, false)));
             return;
         } else {
             new File(get_path(args[1], wo_path, true)).mkdirs();
         }
         if (!suppress_output) {
-            sender.sendMessage(UiHandler.added_folder(args[1], get_path(args[1], wo_path, false)));
+            sender.spigot().sendMessage(UiHandler.added_folder(args[1], get_path(args[1], wo_path, false)));
         }
     }
 
@@ -898,12 +898,12 @@ public class Schems implements TabExecutor {
             if (file != null) {
                 file_path = file_path.endsWith(".schem") ? file_path.substring(0, file_path.length() - 6) : file_path;
                 file_path = file_path.endsWith(".schematic") ? file_path : file_path + ".schematic" ;
-                sender.sendMessage(UiHandler.move_other_name( file_path,
+                sender.spigot().sendMessage(UiHandler.move_other_name( file_path,
                         get_path(args[2], wo_path,false)));
             } else {
                 file = validate_file(sender, file_path + ".schematic", wo_path, false);
                 if (file != null) {
-                    sender.sendMessage(UiHandler.move_other_name(file_path,
+                    sender.spigot().sendMessage(UiHandler.move_other_name(file_path,
                             get_path(args[2], wo_path,false)));
 
                 }
@@ -925,7 +925,7 @@ public class Schems implements TabExecutor {
         String name = tmp_path[tmp_path.length - 1];
 
         file.renameTo(new File(get_path(args[2] + "/" + name, wo_path, true)));
-        sender.sendMessage(UiHandler.moved_file(get_path(args[2], wo_path, false)));
+        sender.spigot().sendMessage(UiHandler.moved_file(get_path(args[2], wo_path, false)));
         command_list(sender, new String[]{"list", get_path(args[2], wo_path, false),"-n"}, player, null);
     }
 
@@ -945,13 +945,13 @@ public class Schems implements TabExecutor {
             file_path = !file_path.endsWith(".schem") ? file_path + ".schem" : file_path;
             file = validate_file(sender, file_path, wo_path, true);
             if (file != null) {
-                sender.sendMessage(UiHandler.load_other_name(file_path));
+                sender.spigot().sendMessage(UiHandler.load_other_name(file_path));
             } else {
                 file_path = file_path.endsWith(".schem") ? file_path.substring(0, file_path.length() - 6) : file_path;
                 file_path = file_path.endsWith(".schematic") ? file_path : file_path + ".schematic" ;
                 file = validate_file(sender, file_path, wo_path, false);
                 if (file != null) {
-                    sender.sendMessage(UiHandler.load_other_name(file_path));
+                    sender.spigot().sendMessage(UiHandler.load_other_name(file_path));
                 }
             }
             return;
@@ -974,7 +974,7 @@ public class Schems implements TabExecutor {
             //If not overwrite
             File file = validate_file(sender, args[1], wo_path, true);
             if (file != null && file.exists()) {
-                sender.sendMessage(UiHandler.file_already_exists_error(args[1]));
+                sender.spigot().sendMessage(UiHandler.file_already_exists_error(args[1]));
             } else {
                 SchematicSorter.performCommand(player, "/schematic save " + get_path(args[1], wo_path, false));
             }

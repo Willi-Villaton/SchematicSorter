@@ -1,11 +1,10 @@
 package com.villaton.schematicsorter.storage;
 
-import de.crafttogether.Callback;
-import de.crafttogether.mysql.MySQLAdapter;
-import de.crafttogether.mysql.MySQLConnection;
+import com.villaton.schematicsorter.SchematicSorter;
+import de.crafttogether.common.mysql.MySQLConnection;
+import de.crafttogether.common.mysql.MySQLConnection.Consumer;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
-import com.villaton.schematicsorter.SchematicSorter;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -13,6 +12,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class UserStorage {
+    private static SchematicSorter plugin = SchematicSorter.getInstance();
     private static HashMap<UUID, User> users = new HashMap<>();
 
     public static String getCwd(UUID uuid) {
@@ -25,8 +25,6 @@ public class UserStorage {
     }
 
     public static void setCwd(UUID uuid, String cwd, Boolean writeToDatabase) {
-        SchematicSorter plugin = SchematicSorter.getInstance();
-
         User user = new User(uuid, cwd);
 
         if (user.getCwd() == null || user.getCwd().isEmpty())
@@ -41,7 +39,6 @@ public class UserStorage {
                 remove(user, (err, success) -> {
                     if (err != null) {
                         plugin.getLogger().warning("[MySQL]: Error: " + err.getMessage());
-                        return;
                     }
                 });
             }
@@ -51,23 +48,21 @@ public class UserStorage {
                 insertOrUpdate(user, (err, success) -> {
                     if (err != null) {
                         plugin.getLogger().warning("[MySQL]: Error: " + err.getMessage());
-                        return;
                     }
                 });
             }
         }
     }
 
-    public static void insertOrUpdate(User user, @Nullable Callback<SQLException, Boolean> callback) {
-        SchematicSorter plugin = SchematicSorter.getInstance();
-        MySQLConnection MySQL = MySQLAdapter.getConnection();
+    public static void insertOrUpdate(User user, @Nullable Consumer<SQLException, Boolean> consumer) {
+        MySQLConnection connection = plugin.getMySQLAdapter().getConnection();
 
-        MySQL.queryAsync("SELECT * FROM `%suser` WHERE `uuid` = '" + user.getUuid() + "'", (err, result) -> {
+        connection.queryAsync("SELECT * FROM `%suser` WHERE `uuid` = '" + user.getUuid() + "'", (err, result) -> {
             if (err != null) {
                 plugin.getLogger().warning("[MySQL:] Error: " + err.getMessage());
 
-                if (callback != null)
-                    callback.call(err, false);
+                if (consumer != null)
+                    consumer.operation(err, false);
             }
 
             else {
@@ -76,7 +71,7 @@ public class UserStorage {
                     if (!result.next()) {
                         plugin.getLogger().info("[MySQL]: Insert User " + Bukkit.getOfflinePlayer(user.getUuid()).getName());
 
-                        MySQL.insertAsync("INSERT INTO `%suser` " +
+                        connection.insertAsync("INSERT INTO `%suser` " +
                                         "(" +
                                         "`uuid`, " +
                                         "`cwd` " +
@@ -91,18 +86,18 @@ public class UserStorage {
                                     if (insertErr != null)
                                         plugin.getLogger().warning("[MySQL]: Error: " + insertErr.getMessage());
 
-                                    if (callback != null)
-                                        callback.call(insertErr, (insertErr == null) ? true : false);
+                                    if (consumer != null)
+                                        consumer.operation(insertErr,insertErr == null);
 
-                                    MySQL.close();
-                                }, MySQL.getTablePrefix());
+                                    connection.close();
+                                }, connection.getTablePrefix());
                     }
 
                     // User found! Try to update...
                     else {
                         plugin.getLogger().info("[MySQL]: Update User " + Bukkit.getOfflinePlayer(user.getUuid()).getName());
 
-                        MySQL.updateAsync("UPDATE `%suser` SET " +
+                        connection.updateAsync("UPDATE `%suser` SET " +
                                         "`uuid` = '" + user.getUuid() + "', " +
                                         "`cwd` = '" + user.getCwd() + "'" +
                                         "WHERE `uuid` = '" + user.getUuid() + "';",
@@ -111,47 +106,45 @@ public class UserStorage {
                                     if (updateErr != null)
                                         plugin.getLogger().warning("[MySQL:] Error: " + updateErr.getMessage());
 
-                                    if (callback != null)
-                                        callback.call(updateErr, (updateErr == null) ? true : false);
+                                    if (consumer != null)
+                                        consumer.operation(updateErr, updateErr == null);
 
-                                    MySQL.close();
-                                }, MySQL.getTablePrefix());
+                                    connection.close();
+                                }, connection.getTablePrefix());
                     }
                 } catch (SQLException ex) {
                     plugin.getLogger().warning("[MySQL]: Error: " + ex.getMessage());
-                    callback.call(ex, false);
+                    consumer.operation(ex, false);
                 }
                 finally {
-                    MySQL.close();
+                    connection.close();
                 }
             }
-        }, MySQL.getTablePrefix());
+        }, connection.getTablePrefix());
     }
 
-    public static void remove(User user, @Nullable Callback<SQLException, Boolean> callback) {
-        SchematicSorter plugin = SchematicSorter.getInstance();
-        MySQLConnection MySQL = MySQLAdapter.getConnection();
+    public static void remove(User user, @Nullable Consumer<SQLException, Boolean> consumer) {
+        MySQLConnection connection = plugin.getMySQLAdapter().getConnection();
 
-        MySQL.updateAsync("DELETE FROM `%suser` WHERE `uuid` = '" + user.getUuid() + "';", (err, affectedRows) -> {
+        connection.updateAsync("DELETE FROM `%suser` WHERE `uuid` = '" + user.getUuid() + "';", (err, affectedRows) -> {
             if (err != null)
                 plugin.getLogger().warning("[MySQL:] Error: " + err.getMessage());
 
-            if (callback != null)
-                callback.call(err, (err == null) ? true : false);
-            MySQL.close();
-        }, MySQL.getTablePrefix());
+            if (consumer != null)
+                consumer.operation(err, (err == null) ? true : false);
+            connection.close();
+        }, connection.getTablePrefix());
     }
 
-    public static void loadAll(@Nullable Callback<SQLException, Collection<User>> callback) {
-        SchematicSorter plugin = SchematicSorter.getInstance();
-        MySQLConnection MySQL = MySQLAdapter.getConnection();
+    public static void loadAll(@Nullable Consumer<SQLException, Collection<User>> consumer) {
+        MySQLConnection connection = plugin.getMySQLAdapter().getConnection();
 
-        MySQL.queryAsync("SELECT * FROM `%suser`", (err, result) -> {
+        connection.queryAsync("SELECT * FROM `%suser`", (err, result) -> {
             if (err != null) {
                 plugin.getLogger().warning("[MySQL:] Error: " + err.getMessage());
 
-                if (callback != null)
-                    callback.call(err, null);
+                if (consumer != null)
+                    consumer.operation(err, null);
             }
 
             else {
@@ -170,24 +163,23 @@ public class UserStorage {
                     plugin.getLogger().warning("[MySQL]: Error: " + ex.getMessage());
                 }
                 finally {
-                    MySQL.close();
+                    connection.close();
                 }
 
-                if (callback != null)
-                    callback.call(err, users.values());
+                if (consumer != null)
+                    consumer.operation(err, users.values());
             }
-        }, MySQL.getTablePrefix());
+        }, connection.getTablePrefix());
     }
 
-    public static void load(UUID _uuid, @Nullable Callback<SQLException, User> callback) {
-        SchematicSorter plugin = SchematicSorter.getInstance();
-        MySQLConnection MySQL = MySQLAdapter.getConnection();
+    public static void load(UUID _uuid, @Nullable Consumer<SQLException, User> consumer) {
+        MySQLConnection connection = plugin.getMySQLAdapter().getConnection();
 
-        MySQL.queryAsync("SELECT * FROM `%suser` WHERE `uuid` = '" + _uuid + "'", (err, result) -> {
+        connection.queryAsync("SELECT * FROM `%suser` WHERE `uuid` = '" + _uuid + "'", (err, result) -> {
             if (err != null) {
                 plugin.getLogger().warning("[MySQL:] Error: " + err.getMessage());
-                if (callback != null)
-                    callback.call(err, null);
+                if (consumer != null)
+                    consumer.operation(err, null);
             }
 
             else {
@@ -206,16 +198,16 @@ public class UserStorage {
                     if (cwd != null)
                         users.put(uuid, user);
 
-                    if (callback != null)
-                        callback.call(null, user);
+                    if (consumer != null)
+                        consumer.operation(null, user);
                 } catch (SQLException ex) {
                     err = ex;
                     plugin.getLogger().warning("[MySQL]: Error: " + ex.getMessage());
                 }
                 finally {
-                    MySQL.close();
+                    connection.close();
                 }
             }
-        }, MySQL.getTablePrefix());
+        }, connection.getTablePrefix());
     }
 }
