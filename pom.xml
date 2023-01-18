@@ -6,7 +6,7 @@
 
     <groupId>com.Villaton</groupId>
     <artifactId>SchematicSorter</artifactId>
-    <version>2.0</version>
+    <version>2.1</version>
     <packaging>jar</packaging>
 
     <name>SchematicSorter</name>
@@ -15,7 +15,22 @@
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.number>NO-CI</project.build.number>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>ci</id>
+            <activation>
+                <property>
+                    <name>env.BUILD_NUMBER</name>
+                </property>
+            </activation>
+            <properties>
+                <project.build.number>${env.BUILD_NUMBER}</project.build.number>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
@@ -44,31 +59,62 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>version-less-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy file="target/${project.name}-${project.version}.jar" tofile="target/static/${project.name}.jar"/>
+                                <copy file="target/${project.name}-${project.version}.jar" tofile="target/static/${project.name}-${project.version}-${project.build.number}.jar"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <includes>
+                    <include>plugin.yml</include>
+                </includes>
             </resource>
         </resources>
     </build>
 
     <repositories>
         <repository>
-            <id>papermc-repo</id>
-            <url>https://papermc.io/repo/repository/maven-public/</url>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+
         <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
+            <id>ctogether-repo</id>
+            <url>https://maven.craft-together.de/</url>
         </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.17.1-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.crafttogether</groupId>
+            <artifactId>CTCommons</artifactId>
+            <version>1.0-BETA</version>
             <scope>provided</scope>
         </dependency>
 
@@ -77,27 +123,6 @@
             <artifactId>commons-io</artifactId>
             <version>2.8.0</version>
             <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>3.4.5</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>2.7.2</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
